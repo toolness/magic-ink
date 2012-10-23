@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Magic Ink Test</title>
+<p>
+  <!-- The data-ink attribute below binds the element's text content
+       to the 'counter' property on our model. -->
+  Testing <span data-ink="set content to counter"></span>.
+</p>
+<script src="magic-ink.js"></script>
+<script src="simple-model.js"></script>
+<script>
+var myModel = new SimpleModel({counter: 1});
+
+MagicInk.engine.bind(document.body, myModel);
+
+setInterval(function() {
+  myModel.set("counter", myModel.get("counter") + 1);
+}, 1000);
+</script>
