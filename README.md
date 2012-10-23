@@ -8,6 +8,6 @@ Template systems have a number of problems. Among them are:
 
 * Only the most advanced/heavyweight ones are bindings-aware, which means that developers are usually burdened with having to watch their models for changes and re-render their views as necessary.
 
-Magic Ink has no dependencies; it uses a browser's DOM to do most of its heavy lifting, and it relies on a minimal subset of the [Backbone.Model][] API to automatically update the DOM based on model changes.
+Magic Ink has no dependencies; it uses a browser's DOM to do most of its heavy lifting, and it relies on a minimal subset of the [Backbone.Model][] API to automatically update the DOM based on changes in the model.
 
   [Backbone.Model]: http://documentcloud.github.com/backbone/#Model
