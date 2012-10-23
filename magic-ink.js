@@ -29,7 +29,7 @@
       };
     },
     baseRules: {
-      "set content to PROPERTY": function(node, model, options) {
+      "content is PROPERTY": function(node, model, options) {
         model.on("change:" + options.PROPERTY, function(model, value) {
           node.textContent = value;
         });
