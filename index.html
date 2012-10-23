@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Magic Ink Test</title>
-<h1>Magic Ink Test</h1>
+<title>Magic Ink Example</title>
+<h1>Magic Ink Example</h1>
+<a href="https://github.com/toolness/magic-ink"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+<p>View source on this page to learn more.</p>
 <p>
   <!-- The data-ink attribute below binds the element's text content
        to the 'counter' property on our model. -->
   Testing <span data-ink="content is counter"></span>.
 </p>
 <script src="magic-ink.js"></script>
+<!-- This optional script provides a very simple subset of the
+     Backbone.Model API; just enough for Magic Ink to listen for
+     changes in the model. -->
 <script src="simple-model.js"></script>
 <script>
 var myModel = new SimpleModel({counter: 1});
 
+// Bind our model to our view.
 MagicInk.engine.bind(document.body, myModel);
 
 setInterval(function() {
