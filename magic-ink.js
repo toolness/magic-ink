@@ -39,11 +39,10 @@
     err: function(msg) {
       if (window.console && window.console.error)
         window.console.error(msg);
-    },
-    toArray: function(arraylike) {
-      return Array.prototype.slice.call(arraylike);
     }
   };
+
+  _.parseCollectionRule = _.parserFromRule("any item in COLLECTION");
 
   exports.Engine = function(rules) {
     this._processors = [];
@@ -106,15 +105,34 @@
       onCollectionReset(collection, {});
     },
     bind: function(root, model) {
-      _.toArray(root.querySelectorAll("[data-ink]")).forEach(function(node) {
-        node.getAttribute("data-ink").split(",").forEach(function(expr) {
-          expr = expr.trim();
-          for (var i = 0; i < this._processors.length; i++)
-            if (this._processors[i](expr, node, model))
-              return;
-          _.err("no rule matches expression: " + expr);
-        }, this);
-      }, this);
+      for (var i = 0; i < root.childNodes.length; i++) {
+        var node = root.childNodes[i];
+        if (node.nodeType == root.ELEMENT_NODE) {
+          if (node.hasAttribute("data-ink-context")) {
+            var context = node.getAttribute("data-ink-context");
+            var parsed = _.parseCollectionRule(context);
+            if (parsed) {
+              var collection = model.get(parsed.COLLECTION);
+              this.bindCollection(node, collection);
+              i += collection.length + 1;
+              continue;
+            } else
+              // TODO: Add support for nested models.
+              _.err("no rule matches data-ink-context expresssion: " + 
+                    context);
+          }
+          if (node.hasAttribute("data-ink")) {
+            node.getAttribute("data-ink").split(",").forEach(function(expr) {
+              expr = expr.trim();
+              for (var i = 0; i < this._processors.length; i++)
+                if (this._processors[i](expr, node, model))
+                  return;
+              _.err("no rule matches data-ink expression: " + expr);
+            }, this);
+          }
+          this.bind(node, model);
+        }
+      }
     }
   };
   

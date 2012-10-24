@@ -21,6 +21,12 @@
           <li><span data-ink="content is counter"></span>.</li>
         </ul>
       </div>
+      <div id="bind-nested-coll-test-fixture">
+        <span data-ink="content is foo"></span>!<div><p 
+        data-ink-context="any item in bars"><span
+        data-ink="content is counter"></span></p></div><span 
+        data-ink="content is baz"></span>.
+      </div>
     </div>
 
     <script src="qunit.js"></script>
@@ -30,6 +36,29 @@
     <script>
     module("magic-ink");
 
+    test("engine.bind() works w/ nested collection", function() {
+      var div = document.getElementById("bind-nested-coll-test-fixture");
+      div = div.cloneNode(true);
+      var coll = new SimpleCollection();
+      var model = new SimpleModel({
+        foo: "hello",
+        bars: coll,
+        baz: "farewell"
+      });
+      var text = function() { return div.textContent.trim(); };
+
+      MagicInk.engine.bind(div, model);
+      equal(text(), "hello!farewell.",
+            "works w/ nothing in nested collection");
+      coll.add([
+        new SimpleModel({counter: 5}),
+        new SimpleModel({counter: 12})
+      ]);
+      model.set("baz", "goodbye");
+      equal(text(), "hello!512goodbye.",
+            "works w/ items in nested collection");
+    });
+    
     test("engine.bindCollection() works", function() {
       var div = document.getElementById("bind-collection-test-fixture");
       div = div.cloneNode(true);
