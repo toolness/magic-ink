@@ -16,13 +16,47 @@
       <div id="bind-test-fixture">
         <p><span data-ink="content is foo"></span></p>
       </div>
+      <div id="bind-collection-test-fixture">
+        <ul>
+          <li><span data-ink="content is counter"></span>.</li>
+        </ul>
+      </div>
     </div>
 
     <script src="qunit.js"></script>
     <script src="../magic-ink.js"></script>
     <script src="../simple-model.js"></script>
+    <script src="../simple-collection.js"></script>
     <script>
     module("magic-ink");
+
+    test("engine.bindCollection() works", function() {
+      var div = document.getElementById("bind-collection-test-fixture");
+      div = div.cloneNode(true);
+      var coll = new SimpleCollection();
+      var text = function() { return div.textContent.trim(); };
+      
+      MagicInk.engine.bindCollection(div.querySelector("li"), coll);
+      equal(text(), '', 'content w/ empty collection is empty');
+      coll.add([new SimpleModel({counter: 1})]);
+      equal(text(), '1.', 'content after add is correct');
+      coll.remove([coll.at(0)]);
+      equal(text(), '', 'content after remove is empty');
+      coll.add([
+        new SimpleModel({counter: 1}),
+        new SimpleModel({counter: 2}),
+        new SimpleModel({counter: 3}),
+      ]);
+      coll.add([new SimpleModel({counter: 99})], {at: 2});
+      equal(text(), '1.2.99.3.', 'insert into middle works');
+      coll.remove([coll.at(1)]);
+      equal(text(), '1.99.3.', 'remove from middle works');
+      coll.reset([
+        new SimpleModel({counter: 500}),
+        new SimpleModel({counter: 503}),
+      ]);
+      equal(text(), '500.503.', 'content after reset works');
+    });
     
     test("engine.bind() works", function() {
       var div = document.getElementById("bind-test-fixture");
