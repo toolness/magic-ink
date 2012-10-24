@@ -65,6 +65,46 @@
         });
       }, this);
     },
+    bindCollection: function(template, collection, where) {
+      where = where || template;
+
+      var self = this;
+      var document = where.ownerDocument;
+      var startNode = document.createComment("collection start");
+      var endNode = document.createComment("collection end");
+      var parentNode = where.parentNode;
+      var nodes = [startNode, endNode];
+      var onCollectionAdd = function(model, collection, options) {
+        var newElement = template.cloneNode(true);
+        parentNode.insertBefore(newElement, nodes[options.index + 1]);
+        nodes.splice(options.index + 1, 0, newElement);
+        self.bind(newElement, model);
+      };
+      var onCollectionRemove = function(model, collection, options) {
+        parentNode.removeChild(nodes[options.index + 1]);
+        nodes.splice(options.index + 1, 1);
+        // TODO: unbind from model?
+      };
+      var onCollectionReset = function(collection, options) {
+        var i;
+        var oldLength = nodes.length - 2;
+
+        for (i = 0; i < oldLength; i++)
+          onCollectionRemove(null, collection, {index: 0});
+        for (i = 0; i < collection.length; i++)
+          onCollectionAdd(collection.at(i), collection, {index: i});
+      };
+
+      parentNode.replaceChild(startNode, where);
+      if (startNode.nextSibling)
+        parentNode.insertBefore(endNode, startNode.nextSibling);
+      else
+        parentNode.appendChild(endNode);
+      collection.on("add", onCollectionAdd);
+      collection.on("remove", onCollectionRemove);
+      collection.on("reset", onCollectionReset);
+      onCollectionReset(collection, {});
+    },
     bind: function(root, model) {
       _.toArray(root.querySelectorAll("[data-ink]")).forEach(function(node) {
         node.getAttribute("data-ink").split(",").forEach(function(expr) {
