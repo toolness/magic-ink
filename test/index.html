@@ -12,12 +12,29 @@
     <div id="qunit-testrunner-toolbar"></div>
     <h2  id="qunit-userAgent"></h2>
     <ol  id="qunit-tests"></ol>
-    <div id="qunit-fixture"></div>
+    <div id="qunit-fixture">
+      <div id="bind-test-fixture">
+        <span data-ink="content is foo"></span>
+      </div>
+    </div>
 
     <script src="qunit.js"></script>
     <script src="../magic-ink.js"></script>
+    <script src="../simple-model.js"></script>
     <script>
     module("magic-ink");
+    
+    test("engine.bind() works", function() {
+      var div = document.getElementById("bind-test-fixture");
+      var model = new SimpleModel({foo: 'hi'});
+      div = div.cloneNode(true);
+      var span = div.querySelector("span");
+      equal(span.textContent, "", "content before bind is correct");
+      MagicInk.engine.bind(div, model);
+      equal(span.textContent, "hi", "content after bind is correct");
+      model.set("foo", "bye");
+      equal(span.textContent, "bye", "content after model change is correct");
+    });
     
     test("parserFromRule() works", function() {
       var parserFromRule = window.MagicInk._impl.parserFromRule;
